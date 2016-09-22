@@ -1,12 +1,13 @@
 import numpy as np
 from chainer import Variable
+from chainer import functions as F
 
-x_data = np.array([[3, 10, 4], [-5, 20, 4]], dtype=np.float32)
+x_data = np.array([5], dtype=np.float32)
 x = Variable(x_data)
-y = x**2 - 2 * x + 1
-print(y.data)
-y.backward()
-print(x.grad)
-x.grad * 0.01
-y = x**2 - 2 * x + 1
-print(y)
+y = F.relu(x)
+
+z = Variable(np.array([[10, 20], [30, 40]], dtype=np.float32))
+zz = F.transpose(z)
+print(zz.data)
+
+# print() exp(x)+sin(x)

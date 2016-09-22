@@ -9,7 +9,6 @@ import numpy as np
 
 
 class MLP(chainer.Chain):
-
     def __init__(self, n_units, n_out):
         super(MLP, self).__init__(
             # the size of the inputs to each layer will be inferred
@@ -26,7 +25,8 @@ class MLP(chainer.Chain):
 batchsize = 100
 train, test = chainer.datasets.get_mnist()
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
-test_iter = chainer.iterators.SerialIterator(test, batchsize, repeat=False, shuffle=False)
+test_iter = chainer.iterators.SerialIterator(test, batchsize,
+                                             repeat=False, shuffle=False)
 
 model = L.Classifier(MLP(784, 10))
 opt = chainer.optimizers.Adam()
@@ -71,4 +71,3 @@ if resume:
 
 # Run the training
 trainer.run()
-

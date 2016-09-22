@@ -9,4 +9,6 @@ print(x.ndim) # xの軸数
 
 print(x.size) # xの全要素数
 
-print(x.dtype) # xの型）
+print(x.dtype) # xの型
+
+# x[i, i, i]=1, それ以外は0となるようなx
