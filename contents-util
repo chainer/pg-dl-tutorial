@@ -1,0 +1,150 @@
+#!/bin/bash
+CONFIG_FILE=book.yml
+with_dummy=false
+
+exit_with_usage() {
+  cat <<EOS
+usage:
+$0 [commands]
+
+commands:
+
+generate [--with-dummy-text|-t] <# of contents>:
+                           generate a specified number of contents without section
+clean:                     (DANGER) remove all numeric contents directories
+add-metadata:              generate metadata.yml into the same directory where contents.md exists
+
+EOS
+  exit 1
+}
+
+generate_contents() {
+  num=$1
+  for i in `seq 1 $num`; do
+    generate_content $i
+  done
+}
+
+generate_content() {
+  i=$1
+  id=`printf %03d $i`
+  echo "Generating $id ..."
+  if [ -d $id ]; then
+    echo "  $id is already exists. skipped"
+    return
+  fi
+  mkdir -p $id
+  cd $id
+  generate_skeletone
+  [ with_dummy ] && append_dummy_texts
+  cd ..
+}
+
+append_dummy_texts() {
+  if which shuf > /dev/null; then
+    shuf -n40 /usr/share/dict/words | sed "s|'||" | xargs -n10 >> contents.md
+  elif which gshuf > /dev/null; then
+    gshuf -n40 /usr/share/dict/words | sed "s|'||" | xargs -n10 >> contents.md
+  else
+    echo "  shuf or gshuf isn't found here. skipped generating dummy contents.."
+  fi
+}
+
+dummy_title() {
+  if which shuf > /dev/null; then
+    shuf -n5 /usr/share/dict/words | sed "s|'||" | xargs
+  elif which gshuf > /dev/null; then
+    gshuf -n5 /usr/share/dict/words | sed "s|'||" | xargs
+  fi
+}
+
+generate_skeletone() {
+  generate_metadata `pwd`
+  title="<Content Title>"
+  [ with_dummy ] && title=`dummy_title`
+  cat<<EOS > contents.md
+# $title
+
+EOS
+}
+
+generate_metadata() {
+  path=$1
+  uuid=`gen_uuid`
+  cat<<EOS > $path/metadata.yml
+uuid: $uuid
+EOS
+}
+
+generate_config() {
+  if [ -f $CONFIG_FILE ]; then
+    echo "Config is already exists. Skipped to generate config"
+    return
+  fi
+
+  echo "Generate config ..."
+  uuid=`gen_uuid`
+  title="<Content Title>"
+  [ with_dummy ] && title=`dummy_title`
+  cat<<EOS > $CONFIG_FILE
+uuid: $uuid
+title: $title
+EOS
+}
+
+gen_uuid() {
+  if [ -f /proc/sys/kernel/random/uuid ]; then
+    cat /proc/sys/kernel/random/uuid
+  elif which uuidgen > /dev/null; then
+    uuidgen
+  else
+    # Puts a placeholder since this platform doesn't support to generate uuid
+    echo "<PUT UUID here>"
+  fi
+}
+
+check_dummy_capability() {
+  if which shuf > /dev/null; then
+    return
+  elif which gshuf > /dev/null; then
+    return
+  else
+    echo "shuf and gshuf are not found. Install either, or don't use '--with-dummy-text' flag"
+    exit 1
+  fi
+}
+
+add_metadata() {
+  for dir in `find . -name 'contents.md' -exec dirname {} \;`; do
+    echo "Generating $dir/metadata.yml..."
+    generate_metadata $dir
+  done
+}
+
+case "$1" in
+  generate)
+    shift
+    if [ "$1" == "-t" -o "$1" == "--with-dummy-text" ]; then
+      check_dummy_capability
+      with_dummy=true
+      shift
+    fi
+    [ $# -eq 0 ] && exit_with_usage
+    generate_config
+    generate_contents $1
+    ;;
+  clean)
+    ret=n
+    echo -n "Do you delete all content files? y[n]: "
+    read -r ret
+    if [ "$ret" == "y" ]; then
+      echo "Deleting all content files..."
+      ls -1 | egrep '[0-9]+' | xargs -n1 rm -rf
+    fi
+    ;;
+  add-metadata)
+    add_metadata
+    ;;
+  *)
+    exit_with_usage
+esac
