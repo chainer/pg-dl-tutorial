@@ -1,6 +1,0 @@
-# overfurnish bondman cholelithotrity preanal gallerian
-
-elder victim wheelroad sclerodermitic unencouraging vaunt underring maleficent nonsupporting pickleworm
-Trixie tristeza chromotherapy seismometer ciliferous bagreef linha pseudomembrane niggerweed parasitically
-diffrangibility butterflylike querimoniousness Receptaculitidae cervantite conjubilant endolymphatic cladoniaceous Cleridae nonextensive
-mysticality creakingly hygeiolatry incudostapedial Avicennia schematically uninfringed flocky oxozonide impendency
