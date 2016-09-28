@@ -37,6 +37,7 @@ print(c.l1.data)
 
 また，Chainでは各Linkを名前付きで定義していましたが，任意個のLinkのリストを受け取るChainListを使うこともできます。
 
+```
 class MyChainList(ChainList):
   def __init__(self):
     super(MyChain, self).__init__(
@@ -47,7 +48,8 @@ class MyChainList(ChainList):
   def __call__(self, x):
     h = self[0](x)
     return self[1](h)
+```
 
 # 課題
 
-正の整数nを初期化パラメータとして受取，n個のLinear(3, 3)を子Link（l1, l2, ..., ln)として含み，入力に対しl1, l2, ..., lnを順に適用するようなChainオブジェクトを作れ
+正の整数$n$を初期化パラメータとして受取，$n$個の$Linear(3, 3)$を子$Link（l1, l2, ..., ln)$として含み，入力に対し$l1, l2, ..., ln$を順に適用するようなChainオブジェクトを作れ

@@ -1,6 +1,6 @@
 #
 
-はじめに，chainer Tutorial Book (CTB）の仕組みについて簡単に紹介します。
+はじめに，Chainer Tutorial Book (CTB）の仕組みについて簡単に紹介します。
 
 CTBは，Sakuraのサーバーで稼働しているウェブサービスを利用しています。
 

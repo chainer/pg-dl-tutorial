@@ -10,11 +10,11 @@
 
 Chainerの場合，Function, Link, Chainを組み合わせて入力から出力を求める関数を定義することに対応します。
 
-2) 目的関数 L(F(\theta)) を定義する
+2) 目的関数 $L(F(\theta))$ を定義する
 
 Chainerの場合，Classifierや損失関数（例：F.soft_cross_entropyや，F.mean_squared_error）を使うことに対応します。
 
-3) 目的関数を最小化するような\thetaを最適化問題を解くことで得る
+3) 目的関数を最小化するような$\theta$を最適化問題を解くことで得る
 
 Chainerの場合，Optimizerを使って学習させることに対応します。
 

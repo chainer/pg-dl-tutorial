@@ -55,7 +55,6 @@ opt.setup(model)
 　誤差関数に使う関数。上記例の場合はF.softmax_cross_entropy
 * accfun
 　精度評価につかう関数。上記の場合はF.accuracy
-```
 
 ## 課題
 
