@@ -1,0 +1,37 @@
+14 topics by CEATEC
+
+- 001 introduction
+-- what is machine learning / deep learning ?
+- 002 basic of chainer
+-- feedforward networks (example mnist linear, relu, backprop)
+
+specific neural networks
+
+- 003 cnn, image
+-- (example ImageNet, convolutional layer, maxpool, - alexnet, resnet
+- 004 rnn, nlp
+-- example LSTM
+-- word2vec (example word2vec, EmbedID)
+
+- 005 deep generative models
+-- VAE, GAN
+
+component of neural networks
+
+- 006 activation functions
+-- (relu, prelu, elu, sigmoid, tanh)
+- 007 regularization
+-- (dropout, L2norm)
+- 008 optimizers
+-- (adagrad, adam, RMSprop)
+- faster training (BatchNorm)
+- loss (sigmoid_cross_entropy, mean_squared_error)
+
+misc
+
+- numpy, cupy
+- using pretrained model (http://qiita.com/tabe2314/items/6c0c1b769e12ab1e2614)
+- speech recognition (example maybe translate this into chainer https://github.com/pannous/tensorflow-speech-recognition)
+- deep generative models (example VAE)
+
+- k-means and k-means++ by cupy
