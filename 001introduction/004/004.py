@@ -1,9 +1,10 @@
+import chainer
 from chainer import functions as F
 from chainer import links as L
 from chainer import datasets
+import argparse
 
 class MLP(chainer.Chain):
-
     def __init__(self, n_units, n_out):
         super(MLP, self).__init__(
             # the size of the inputs to each layer will be inferred
@@ -17,7 +18,7 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
- model = L.Classifier(MLP(784, 10))
+model = L.Classifier(MLP(784, 10))
 
 parser = argparse.ArgumentParser(description='Chainer example: MNIST')
 parser.add_argument('--gpu', '-g', type=int, default=-1,

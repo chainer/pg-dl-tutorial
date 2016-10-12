@@ -6,6 +6,7 @@ from chainer import Variable, optimizers
 from chainer import training
 from chainer.training import extensions
 import numpy as np
+import argparse
 
 class MLP(chainer.Chain):
 
@@ -47,7 +48,7 @@ opt.setup(model)
 epoch = 10
 
 # Set up a trainer
-updater = training.StandardUpdater(train_iter, opt, device=-1)
+updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
 trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
 
 # Run the training
