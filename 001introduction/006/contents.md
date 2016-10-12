@@ -46,7 +46,6 @@ Reporterは値の名前と実際の値のマッピングを保持します。
 Chainerの中で層やネットワークに対応するLinkやChainはこれらのReporterの機能を備えています。
 
 
-
 ## Evaluator
 
 Evaluatorは学習が終わった後に，test_iterで定義されるテストデータセットで評価をします。

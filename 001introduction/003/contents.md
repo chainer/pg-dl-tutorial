@@ -32,6 +32,12 @@ print x
 print y
 ```
 
+# Memo
+
+ダウンロード先は環境変数
+CHAINER_DATASET_ROOT
+で指定することができます。デフォルトは~/.chainer/datasetです
+
 ## 課題
 
 trainの各ラベル毎の画像の平均ベクトルを求め，それらを順に表示せよ
