@@ -18,3 +18,12 @@ class MLP(chainer.Chain):
         return self.l3(h2)
 
  model = L.Classifier(MLP(784, 10))
+
+parser = argparse.ArgumentParser(description='Chainer example: MNIST')
+parser.add_argument('--gpu', '-g', type=int, default=-1,
+                    help='GPU ID (negative value indicates CPU)')
+args = parser.parse_args()
+
+if args.gpu >= 0:
+    chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
+    model.to_gpu()  # Copy the model to the GPU
