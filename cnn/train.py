@@ -8,6 +8,7 @@ from chainer.training import extensions
 import numpy as np
 import argparse
 import math
+import random
 
 class MLP(chainer.Chain):
 
@@ -35,15 +36,15 @@ class Block(chainer.Chain):
             c2=L.Convolution2D(out_ch, out_ch, 3, pad=1, stride=1, wscale=w, nobias=True)
         )
         if in_ch != out_ch:
-            self.add_link("proj", L.Convolution2D(in_ch, out_ch, 1, pad=0, stride=2, wscale=w, nobias=True))
+            self.add_link("proj", L.Convolution2D(in_ch, out_ch, 3, pad=1, stride=2, wscale=w, nobias=True))
 
         self.in_ch = in_ch
         self.out_ch = out_ch
         self.use_proj = in_ch != out_ch
 
     def __call__(self, x, train):
-        h = self.c1(F.relu(self.bn1(x, test=not train)))
-        h = self.c2(F.relu(self.bn2(h, test=not train)))
+        h = self.c1(F.elu(self.bn1(x, test=not train)))
+        h = self.c2(F.elu(self.bn2(h, test=not train)))
         shortcut = self.proj(x) if self.use_proj else x
                           
         return h + shortcut
@@ -62,17 +63,17 @@ class Group(chainer.Chain):
         return x
         
 
-class WideResNet(chainer.Chain):
+class ResNet(chainer.Chain):
 
-    def __init__(self, n_out, n_layers=9, k=1):
+    def __init__(self, n_out, n_layers=9):
         w = math.sqrt(2)
-        super(WideResNet, self).__init__(
+        super(ResNet, self).__init__(
             conv1=L.Convolution2D(3, 16, 3, pad=1, stride=1, wscale=w, nobias=True),
-            conv2=Group(n_layers, 16, 16*k, False),
-            conv3=Group(n_layers, 16*k, 32*k, True),
-            conv4=Group(n_layers, 32*k, 64*k, True),
-            bn=L.BatchNormalization(64*k),
-            fc=L.Linear(64*k, n_out)
+            conv2=Group(n_layers, 16, 16, False),
+            conv3=Group(n_layers, 16, 32, True),
+            conv4=Group(n_layers, 32, 64, True),
+            bn=L.BatchNormalization(64),
+            fc=L.Linear(64, n_out)
         )
         self.train = True
 
@@ -81,35 +82,88 @@ class WideResNet(chainer.Chain):
         h = self.conv2(h, self.train)
         h = self.conv3(h, self.train)
         h = self.conv4(h, self.train)
-        h = F.relu(self.bn(h))
+        h = F.elu(self.bn(h))
         h = F.average_pooling_2d(h, 8, stride=1)
         h = self.fc(h)
         return h
+
+class PreprocessedDataset(chainer.dataset.DatasetMixin):
+
+    def __init__(self, base, crop_size=4, random=True):
+        self.base = base
+        self.crop_size = crop_size
+        self.random = random
+
+    def __len__(self):
+        return len(self.base)
+
+    def get_example(self, i):
+        # It reads the i-th image/label pair and return a preprocessed image.
+        # It applies following preprocesses:
+        #     - Cropping (random or center rectangular)
+        #     - Random flip
+        #     - Scaling to [0, 1] value
+        crop_size = self.crop_size
+
+        image, label = self.base[i]
+        _, h, w = image.shape
+
+        if self.random:
+            # Randomly crop a region and flip the image
+            top = random.randint(-4, 4)
+            left = random.randint(-4, 4)
+            bottom = top + h
+            right = left + w
+            new_image = np.zeros_like(image)
+            if top < 0:
+                if left < 0:
+                    new_image[:, -top:h, -left:w] = image[:, 0:bottom, 0:right]
+                else:
+                    new_image[:, -top:h, 0:w-left] = image[:, 0:bottom, left:w]
+            else:
+                if left < 0:
+                    new_image[:, 0:h-top, -left:w] = image[:, top:h, 0:right]
+                else:
+                    new_image[:, 0:h-top, 0:w-left] = image[:, top:h, left:w]
+            image = new_image
+
+            if random.randint(0, 1):
+                image = image[:, :, ::-1]
+
+        mean = image.mean(axis=(1, 2))
+        var = image.var(axis=(1, 2))
+        var += 1e-10
+        image -= mean[:, np.newaxis, np.newaxis]
+        image /= var[:, np.newaxis, np.newaxis]
+        return image, label
 
 parser = argparse.ArgumentParser(description='Chainer example: MNIST')
 parser.add_argument('--gpu', '-g', type=int, default=-1,
                     help='GPU ID (negative value indicates CPU)')
 args = parser.parse_args()
 
-train, test = chainer.datasets.get_cifar100()
+train, test = chainer.datasets.get_cifar10()
+pre_train = PreprocessedDataset(train)
+pre_test = PreprocessedDataset(test, False)
 
-batchsize = 200
-train_iter = chainer.iterators.SerialIterator(train, batchsize)
-test_iter = chainer.iterators.SerialIterator(test, batchsize,
+batchsize = 128
+train_iter =chainer.iterators.SerialIterator(pre_train, batchsize)
+test_iter = chainer.iterators.SerialIterator(pre_test, batchsize,
                                              repeat=False, shuffle=False)
 
 # model = L.Classifier(MLP(784, 10))
-model = L.Classifier(WideResNet(100, 4, 1))
+model = L.Classifier(ResNet(10, 4))
 
 if args.gpu >= 0:
     chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
     model.to_gpu()  # Copy the model to the GPU
 
-opt = chainer.optimizers.Adam()
+opt = chainer.optimizers.MomentumSGD(lr=0.1, momentum=0.9)
 opt.use_cleargrads()
 opt.setup(model)
+opt.add_hook(chainer.optimizer.WeightDecay(0.0005))
 
-epoch = 30
+epoch = 200
 
 # Set up a trainer
 updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
