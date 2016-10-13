@@ -116,8 +116,10 @@ check_dummy_capability() {
 
 add_metadata() {
   for dir in `find . -name 'contents.md' -exec dirname {} \;`; do
-    echo "Generating $dir/metadata.yml..."
-    generate_metadata $dir
+    if [ ! -f $dir/metadata.yml ]; then
+      echo "Generating $dir/metadata.yml..."
+      generate_metadata $dir
+    fi
   done
 }
 
