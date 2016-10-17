@@ -1,4 +1,4 @@
-#
+# Chainer Tutorial Bookについて
 
 はじめに，Chainer Tutorial Book (CTB）の仕組みについて簡単に紹介します。
 
