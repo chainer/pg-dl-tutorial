@@ -9,13 +9,33 @@ $0 [commands]
 
 commands:
 
-generate [--with-dummy-text|-t] <# of contents>:
+generate [--with-dummy-text|-t] <# of sections> <# of contents per section>:
                            generate a specified number of contents without section
 clean:                     (DANGER) remove all numeric contents directories
 add-metadata:              generate metadata.yml into the same directory where contents.md exists
 
 EOS
   exit 1
+}
+
+generate_sections() {
+  num_sections=$1
+  num_contents=$2
+  for i in `seq 1 $num_sections`; do
+    generate_section $i $num_contents
+  done
+}
+
+generate_section() {
+  i=$1
+  word=`dummy_name`
+  num_contents=$2
+  section_name=`printf %03d-%s $i $word`
+  echo "Generating $section_name section..."
+  mkdir $section_name
+  cd $section_name
+  generate_contents $num_contents
+  cd ../
 }
 
 generate_contents() {
@@ -28,9 +48,9 @@ generate_contents() {
 generate_content() {
   i=$1
   id=`printf %03d $i`
-  echo "Generating $id ..."
+  echo "  Generating $id ..."
   if [ -d $id ]; then
-    echo "  $id is already exists. skipped"
+    echo "    $id is already exists. skipped"
     return
   fi
   mkdir -p $id
@@ -55,6 +75,14 @@ dummy_title() {
     shuf -n5 /usr/share/dict/words | sed "s|'||" | xargs
   elif which gshuf > /dev/null; then
     gshuf -n5 /usr/share/dict/words | sed "s|'||" | xargs
+  fi
+}
+
+dummy_name() {
+  if which shuf > /dev/null; then
+    shuf -n1 /usr/share/dict/words
+  elif which gshuf > /dev/null; then
+    gshuf -n1 /usr/share/dict/words
   fi
 }
 
@@ -116,8 +144,10 @@ check_dummy_capability() {
 
 add_metadata() {
   for dir in `find . -name 'contents.md' -exec dirname {} \;`; do
-    echo "Generating $dir/metadata.yml..."
-    generate_metadata $dir
+    if [ ! -f $dir/metadata.yml ]; then
+      echo "Generating $dir/metadata.yml..."
+      generate_metadata $dir
+    fi
   done
 }
 
@@ -129,9 +159,9 @@ case "$1" in
       with_dummy=true
       shift
     fi
-    [ $# -eq 0 ] && exit_with_usage
+    [ $# -eq 1 ] && exit_with_usage
     generate_config
-    generate_contents $1
+    generate_sections $1 $2
     ;;
   clean)
     ret=n
