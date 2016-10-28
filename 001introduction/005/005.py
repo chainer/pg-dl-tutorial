@@ -8,6 +8,7 @@ from chainer.training import extensions
 import numpy as np
 import argparse
 
+
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
@@ -23,6 +24,7 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
+
 parser = argparse.ArgumentParser(description='Chainer example: MNIST')
 parser.add_argument('--gpu', '-g', type=int, default=-1,
                     help='GPU ID (negative value indicates CPU)')
@@ -33,7 +35,7 @@ train, test = chainer.datasets.get_mnist()
 batchsize = 100
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
 test_iter = chainer.iterators.SerialIterator(test, batchsize,
-            
+
                                              repeat=False, shuffle=False)
 
 model = L.Classifier(MLP(784, 10))
