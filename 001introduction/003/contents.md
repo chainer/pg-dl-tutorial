@@ -25,7 +25,26 @@ print y
 ```
 
 xは784次元のベクトル，yがラベル（整数値）です。
-なお， `print x` はChainer Playgroundでは大きすぎてそのままでは表示できません。
+なお， `print x` はChainer Playgroundでは大きすぎてそのままでは表示できませんし，
+単純な数値として表示されるだけなのでよく分かりません。
+
+そのためChainer Playgroundでは専用の補助関数 `print_mnist` を用意しています。
+それを利用することでMNISTデータセットの画像を表示できます。
+`print_mnist` を使用するためにはまず `playground` をインポートします。
+
+```
+import playground
+```
+
+その後，
+
+```
+x, y = train[100]
+playground.print_mnist(x)
+print y
+```
+
+とすることで100番目のデータを画像として表示します。
 
 ## 課題
 

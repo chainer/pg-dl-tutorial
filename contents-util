@@ -13,6 +13,7 @@ generate [--with-dummy-text|-t] <# of sections> <# of contents per section>:
                            generate a specified number of contents without section
 clean:                     (DANGER) remove all numeric contents directories
 add-metadata:              generate metadata.yml into the same directory where contents.md exists
+insert-page <section-path> <position>: insert new page into specified position page
 
 EOS
   exit 1
@@ -151,6 +152,23 @@ add_metadata() {
   done
 }
 
+insert_page() {
+  path=$1
+  position=$2
+  last_position=`ls -1 $path | tail -1 | bc -l`
+
+  for i in `seq $last_position $position`; do
+    src=$path/`printf "%03d" $i` 
+    dst=$path/`printf "%03d" $(($i+1))`
+    echo "Moving files from $src to $dst ..."
+    mv $src $dst
+  done
+
+  cd $path
+  generate_content $position
+  cd ../
+}
+
 case "$1" in
   generate)
     shift
@@ -174,6 +192,11 @@ case "$1" in
     ;;
   add-metadata)
     add_metadata
+    ;;
+  insert-page)
+    shift
+    [ $# -lt 2 ] && exit_with_usage
+    insert_page $@
     ;;
   *)
     exit_with_usage
