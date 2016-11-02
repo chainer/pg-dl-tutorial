@@ -158,10 +158,10 @@ insert_page() {
   last_position=`ls -1 $path | tail -1 | bc -l`
 
   for i in `seq $last_position $position`; do
-    src=$path/`printf "%03d" $i` 
+    src=$path/`printf "%03d" $i`
     dst=$path/`printf "%03d" $(($i+1))`
     echo "Moving files from $src to $dst ..."
-    mv $src $dst
+    git mv $src $dst
   done
 
   cd $path
