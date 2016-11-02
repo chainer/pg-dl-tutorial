@@ -1,67 +1,99 @@
-# Chainerを使った深層学習 MNIST
+# 機械学習
 
-それではさっそく，Chainerを使った深層学習を動かしてみましょう。
+ニューラルネットワークを含む多くの機械学習における学習タスクは最適なパラメータを探す問題です。
+最適なパラメータは目的関数の最小化（最大化）問題を解くことで自動的に得られます。
 
-ここでは，MNISTとよばれる手書き文字データセットを使って，多層パーセプトロンによる多クラス分類器の学習をしてみましょう。
-MNISTデータセットは70000枚の28*28のグレイスケール画像から構成されており，それぞれに0〜9の数字がかかれています。
-このデータセットを60000の学習データと，10000のテストデータに分けて使います。
+一般に何かを学習させたいという場合は次のステップからなります。
 
-なお，以降では各画像を28*28の画素を並べた784のグレイスケール値がならんた784次元のベクトルとして扱うようにします。
+1) 学習対象のモデルを定義する
+2) 目的関数を定義する
+3) 目的関数を最適化することで，モデルを学習する
 
-MNISTデータセットのダウンロードは次の `dataset.get_mnist()` を呼び出すことで実行されます。
+これらを順番にみていきましょう。
 
-```
-from chainer import dataset
-train, test = dataset.get_mnist()
-```
 
-これらのデータは `chainer.TupleDataset` で構成されており，各サンプルが画像とそのラベル（0〜9）のタプルから構成されています。
-例えば，train[100]は100番目のデータの画像とラベルからなるタプルを返します
+1) 学習対象のモデルを定義する
 
-```
-x, y = train[100]
-print x
-print y
-```
+パラメトリックモデルはパラメータθで特徴付けられた関数y=F(x; θ)で表すことができます。
+この関数F(x; θ)はxを受け取り，yを返すような関数です。
 
-xは784次元のベクトル，yがラベル（整数値）です。
-なお， `print x` はChainer Playgroundでは大きすぎてそのままでは表示できませんし，
-単純な数値として表示されるだけなのでよく分かりません。
+この関数の挙動がパラメータθで変わることを示すために，引数とは違って;θと表します。
 
-そのためChainer Playgroundでは専用の補助関数 `print_mnist` を用意しています。
-それを利用することでMNISTデータセットの画像を表示できます。
-`print_mnist` を使用するためにはまず `playground` をインポートします。
+Chainerではこのようなパラメータθで特徴付けられた関数はLinkとよばれます。
+例えば，線形関数，またの名をアフィン変換を表すLinkであるLinearは
 
-```
-import playground
-```
+f(x; θ) = Wx + b
 
-その後，
+という関数に対応します．この，パラメータθは行列Wと，ベクトルbであり，θ=(W, b)です。
+
+例えば，今回のMNISTの場合，入力ベクトルxから0〜9の数を推定するようなモデルを作りたいと考えます。
+モデルは一つ以上の学習可能な関数を組み合わせて構築
+
+これはChainerでは次のように書けます。
 
 ```
-x, y = train[100]
-playground.print_mnist(x)
-print y
+class MLP(chainer.Chain):
+
+    def __init__(self, n_units, n_out):
+        super(MLP, self).__init__(
+            # the size of the inputs to each layer will be inferred
+            l1=L.Linear(None, n_units),  # n_in -> n_units
+            l2=L.Linear(None, n_units),  # n_units -> n_units
+            l3=L.Linear(None, n_out),  # n_units -> n_out
+        )
+
+    def __call__(self, x):
+        h1 = F.relu(self.l1(x))
+        h2 = F.relu(self.l2(h1))
+        return self.l3(h2)
 ```
 
-とすることで100番目のデータを画像として表示します。
 
-## 課題
+順番にみていきましょう。Linkとは学習可能なパラメータを持つ関数であり，Linearは
+上記の線形変換Wx + bの処理に対応します。
+Linearの第一引数は，入力を何次元か，第二引数は出力を何次元かです。
 
-trainの各ラベル毎の画像の平均ベクトルを求め，それらを順に表示せよ
 
-## 補足： `dataset.get_mnist()` によるデータセットの取得
 
-`dataset.get_mnist()` は一度目の呼び出し時は実際にデータセットをダウンロードするため遅いですが，
-二回目以降は既にダウンロードされているキャッシュを利用して実行されますので速く処理されます。手元で `dataset.get_mnist()` を実行する際，ダウンロード先は環境変数
-`CHAINER_DATASET_ROOT` で指定することができます。
-デフォルトは `~/.chainer/dataset` です。
+Linearは学習可能な線形変換を表します。
+作成したLinearは()を使って適用することが可能です。
+y = l(x)
+は，線形変換を適用しそれをyに格納することを意味します。
 
-また，Chainer Playground内では事前にデータセットをダウンロードしキャッシュ済みの状態になっています。
-そのためChainer Playgroundでは何度 `dataset.get_mnist()` を実行してもデータセットを公開しているサーバに負担がかかることはありません。
+2) 目的関数 $L(F(\theta))$ を定義する
 
-## 補足：他のデータセット
+次に学習によって達成したいことを表す目的関数を定義します。
+例えば，回帰問題の場合は，予測した値yと実際の値tが一致している場合は0，一致していない場合は大きな正の値をとるように
+二乗誤差$(y - t)^2$を使います。
 
-MNISTは，様々な研究開発のベースラインとしてよく使用されているデータセットであり，新しい手法の性能評価，デバッグのためにも使われます。
-最近は，より現実世界の問題に近い複雑なデータセットであるCIFAR-10，CIFAR-100やSVHN（Street View House Numbers)データセットが使われる場合も多くなっています。
-http://ufldl.stanford.edu/housenumbers/
+Chainerには，二乗誤差を表すmean_squared_errorが用意されていますので，それを使います。
+
+```
+t = np.asarray([1, 8], dtype=np.float32)
+t = Variable(t)
+loss = F.mean_squared_error(y, t)
+```
+
+3) 目的関数を最小化するような$\theta$を最適化問題を解くことで得る
+
+最後に，目的関数を最小化するような\thetaを求めます。
+
+```
+from chainer import optimizer
+opt = optimzier.SGD()
+opt.setup(l)
+opt.use_cleargrads()
+
+...
+
+loss.backward()
+model.update()
+```
+
+Chainerの場合，Optimizerを使って学習させることに対応します。
+
+これらを順に紹介していきます。
+
+
+# 
+
