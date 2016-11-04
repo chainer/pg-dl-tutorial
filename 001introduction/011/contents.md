@@ -1,80 +1,62 @@
-# シリアライザ
+# MNIST：Iterator, Updater, Trainer
 
-シリアライザは現在の状態をストレージなどに保存したり，読み込んだりする機能です。
-`Link`, `Optimizer`, `Trainer` がシリアリザをサポートしています。
+Chainerでは学習操作を抽象化するために，`Iterator`, `Updater`, `Optimizer`, `Trainer` の四つの機能を備えています。
 
-```
-serializers.save_npz('my.model', model)
-```
+これらを順に紹介していきます。
 
-これは，modelを'my.model'にNPZ（numpy + zip）形式で保存します。
+## `Iterator`
 
-保存されたモデルは `load_npz` で読み込むことができます。
-
-```
-serializers.load_npz'my.model', model)
-```
-
-同様に，HDF5フォーマットで保存するための `save_hdf5`, `load_hdf5` が存在します。
-
-なお，シリアライズされるのは，parametersとpersistent valuesのみでそれ以外の属性値はシリアライズされないことに注意してください。シリアライズの対象にするには，`add_persistent()` を利用してください。
-
-
-## 拡張機能
-
-Trainerは拡張機能をサポートしています。
-以下に代表的な拡張機能を紹介していきます。
-
-以下では
+`Iterator` はデータセット上の操作，アクセスを抽象化します。
+構築時にデータセットを引数として指定すると，そのデータセットに対する `Iterator` を返します。
+引数として，`batch_size` は，一度のアクセスでいくつ同時に読み込むか， `shuffleは` アクセスの際にランダムにアクセスするかどうかを指定します。
 
 ```
-from chainer.training import extentions
+train_iter = iterators.SerialIterator(train, batch_size=100, shuffle=True)
+test_iter = iterators.SerialIterator(test, batch_size=100, repeat=False, shuffle=False)
 ```
 
-として拡張機能が既に `import` されているものとします。
+## `Optimizer`
 
-## `Observations`, `Reporter`
+`Optimizer` はパラメータの最適化を担当します。
+ここでは複数ある `Optimizer` の中で `Adam` を使います。
+`Adam` は広い学習問題で安定して学習できるモデルです。
 
-拡張機能を説明する前に， `Observations` と `Reporter` という仕組みを紹介します。
-ユーザーが監視した値を集めるための機能として `Reporter` があります。
-`Reporter` は値の名前と実際の値のマッピングを保持します。
-このマッピングを `Observations` とよびます。
-
-例えば， `"accuracy"` という値の名前について，実際の値"0.975"が `Reporter` は登録しているとします。
-
-Chainerの中で層やネットワークに対応する `Link` や `Chain` はこれらの `Reporter` の機能を備えています。
-
-
-## `Evaluator`
-
-`Evaluator` は学習が終わった後に， `test_iter` で定義されるテストデータセットで評価をします。
+`Optimizer` は最適化対象の `Link` を指定する必要があります。
 
 ```
-trainer.extend(extensions.Evaluator(test_iter, model))
+opt = chainer.optimizers.Adam()
+opt.setup(model)
 ```
 
-## `LogReport`
+## `Updater`
 
-`LogReport` は `reporter` に報告された値をログファイルに格納してくれます。
-
-```
-trainer.extend(extensions.LogReport())
-```
-
-`PrintReport` は指定した値名を持つ `Observations` を表示してくれます。
+`Updater` はパラメータの更新を担当します。
+`Updater` にはこれまでに作った `Iterator` と `Optimizer` を渡します。
 
 ```
-trainer.extend(extensions.PrintReport(['epoch', 'main/accuracy', 'validation/main/accuracy']))
+updater = training.StandardUpdater(train_iter, opt)
 ```
 
-`ProgressBar` は学習の進捗度合いをプログレスバーで表示してくれます。
+## `Trainer`
+
+`Trainer` は訓練の実行を担当します。
+`Trainer` の構築時には， `Updater` と学習の回数，そして出力結果を指定します。
 
 ```
-trainer.extend(extensions.ProgressBar())
+trainer = training.Trainer(updater, (20, 'epoch'), out='result')
 ```
 
-`Snapshot` は定期的にモデルのスナップショットを記録し，出力ディレクトリに格納します。
+二つ目の引数は訓練回数を示す引数であり，単位として `'epoch'` か `'iteration'` を受けとります。
+
+例えば， `(20, 'epoch')` はデータ全体を20回走査するという意味ですし， `(1000, 'iteration')` はミニバッチを1000回動かすという意味です。
+
+これで準備ができました。後は `run()` をよびだし実行するだけです。
 
 ```
-trainer.extend(extensions.Snapshot((10, 'epoch')))
+trainer.run()
 ```
+
+## 課題
+
+`Trainer` を実際に動かし学習できることを確かめてください。
+その上で例えばユニット数を変えたり，収束回数を変えたり， `Optimizer` を変えたりして精度が変わることを確認してください。
