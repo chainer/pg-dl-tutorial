@@ -49,11 +49,11 @@ opt.setup(model)
 epoch = 10
 
 # Set up a trainer
-updater = training.StandardUpdater(train_iter, opt, device=-1)
+updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
 trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
 
 # Evaluate the model with the test dataset for each epoch
-trainer.extend(extensions.Evaluator(test_iter, model, device=-1))
+trainer.extend(extensions.Evaluator(test_iter, model, device=args.gpu))
 
 # Dump a computational graph from 'loss' variable at the first iteration
 # The "main" refers to the target link of the "main" optimizer.
