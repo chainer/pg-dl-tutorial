@@ -113,6 +113,8 @@ loss = F.softmax_cross_entropy(h, t)
 
 $$||y - f(x)||^2$$
 
+これは，Chainerでは `mean_squared_error` として用意されています。
+
 ```
 loss = F.mean_squared_error(h, t)
 ```
