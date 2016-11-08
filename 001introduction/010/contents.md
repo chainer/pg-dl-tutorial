@@ -88,6 +88,7 @@ softmaxの定義域は負を含む実数ですので，その入力を非負に�
 
 このように作ったMLPを分類器として使うには `L.Classifier` を使ってモデルを作ります。
 `Classifier` はデフォルトでは分類器softmax，学習時の損失関数はsoftmaxクロスエントロピー損失を使います。
+`Classifier`が引数としてとるモデルは__call__()で順計算が定義されていることを想定しています。
 
 ```
 model = L.Classifier(MLP(784, 10))
