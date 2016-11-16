@@ -18,9 +18,3 @@ class MLP(chainer.Chain):
         return self.l3(h2)
 
 model = L.Classifier(MLP(784, 10))
-
-model = L.Classifier(MLP(784, 10))
-gpu = 0 # -1 if use CPU
-if gpu >= 0
-    chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
-    model.to_gpu()  # Copy the model to the GPU
