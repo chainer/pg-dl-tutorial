@@ -23,11 +23,22 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
+# create model
 model = L.Classifier(MLP(784, 10))
-gpu = 0 # -1 if use CPU
-if gpu >= 0
-    chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
-    model.to_gpu()  # Copy the model to the GPU
 
+# load dataset
 train, test = chainer.datasets.get_mnist()
 
+# Set up a iterator
+batchsize = 100
+train_iter = chainer.iterators.SerialIterator(train, batchsize)
+test_iter = chainer.iterators.SerialIterator(test, batchsize,
+                                             repeat=False, shuffle=False)
+
+# Set up an optimizer
+
+# Set up an updater
+
+# Set up a trainer
+
+# Run the trainer

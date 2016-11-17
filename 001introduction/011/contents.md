@@ -47,6 +47,7 @@ updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
 最後に学習ループを担当する `Trainer` を用意します。
 
 ```
+# Set up a trainer
 epoch = 10
 trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
 ```
@@ -77,7 +78,7 @@ trainer.extend(extensions.ProgressBar())
 最後にtrainerのrunを呼び出すことで学習できます。
 
 ```
-# Run the training
+# Run the trainer
 trainer.run()
 ```
 
