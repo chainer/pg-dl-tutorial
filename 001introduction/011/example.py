@@ -7,6 +7,7 @@ from chainer import training
 from chainer.training import extensions
 import numpy as np
 
+import playground
 
 class MLP(chainer.Chain):
 
@@ -24,10 +25,12 @@ class MLP(chainer.Chain):
         return self.l3(h2)
 
 # create model
-model = L.Classifier(MLP(784, 10))
+model = L.Classifier(MLP(100, 10))
 
 # load dataset
-train, test = chainer.datasets.get_mnist()
+train_full, test_full = chainer.datasets.get_mnist()
+train = datasets.SubDataset(train_full, 0, 1000)
+test = datasets.SubDataset(test_full, 0, 1000)
 
 # Set up a iterator
 batchsize = 100
@@ -42,3 +45,5 @@ test_iter = chainer.iterators.SerialIterator(test, batchsize,
 # Set up a trainer
 
 # Run the trainer
+
+# Check the result

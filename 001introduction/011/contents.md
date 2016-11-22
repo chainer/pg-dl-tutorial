@@ -3,11 +3,15 @@
 これまで，学習/評価用データセットを作り，また学習対象のモデルを作りました。
 
 ```
-train, test = chainer.datasets.get_mnist()
-model = L.Classifier(MLP(784, 10))
+train_full, test_full = chainer.datasets.get_mnist()
+train = datasets.SubDataset(train_full, 0, 1000)
+test = datasets.SubDataset(test_full, 0, 1000)
+model = L.Classifier(MLP(100, 10))
 ```
 
 それでは実際に学習させてみましょう。
+今回は時間短縮のためMNISTデータセットのうち1000件のみを用いることにします。
+
 Chainerでは学習操作を抽象化するための機能が揃っています。
 これらを利用することで殆ど自分でコードを書くことなく学習させることができます。
 
@@ -37,19 +41,20 @@ opt.setup(model)
 
 次に，実際のパラメータ更新を担当する `Updater` を用意します。
 これまで用意した学習用データに対するIterator，最適化を担当する `Optimizer` ，そしてどのデバイスで
-実行するのかを指定します。
+実行するのかを指定します。`device=-1`はCPUを使うことを表します。
 
 ```
 # Set up an updater
-updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
+updater = training.StandardUpdater(train_iter, opt, device=-1)
 ```
 
 最後に学習ループを担当する `Trainer` を用意します。
+今回は5エポック(5回データセットを走査する)だけ学習を回すようにします。
 
 ```
 # Set up a trainer
-epoch = 10
-trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
+epoch = 5
+trainer = training.Trainer(updater, (epoch, 'epoch'), out='/tmp/result')
 ```
 
 `Trainer` は様々な拡張機能を使うことができます。
@@ -57,30 +62,38 @@ trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
 評価データで評価をするには，次のようにします。
 
 ```
-trainer.extend(extensions.Evaluator(test_iter, model, device=args.gpu))
+trainer.extend(extensions.Evaluator(test_iter, model, device=-1))
 ```
 
 学習途中の結果を表示するには，次のようにします。
+1エポックごとに、trainデータに対するaccuracyと、testデータに対するaccuracyを出力させます。
 
 ```
+trainer.extend(extensions.LogReport(trigger=(1, "epoch")))
 trainer.extend(extensions.PrintReport(
-        ['epoch', 'main/loss', 'validation/main/loss',
-         'main/accuracy', 'validation/main/accuracy']))
-```
-
-最後に，学習の進捗状況をプログレスバーで表示するには次のようにします。
-
-```
-trainer.extend(extensions.ProgressBar())
+        ['epoch', 
+         'main/accuracy', 'validation/main/accuracy']), trigger=(1, "epoch"))
 ```
 
 これで全て用意ができました。
-最後にtrainerのrunを呼び出すことで学習できます。
+trainerのrunを呼び出すことで学習できます。
 
 ```
 # Run the trainer
 trainer.run()
 ```
+
+最後に学習の結果を確認してみましょう。
+ランダムに選んだテストデータ一件に対する予測を出力します。
+
+```
+x, y = test[np.random.randint(len(test))]
+playground.print_mnist(x)
+pred = F.softmax(model.predictor(Variable(x.reshape((1, 784))))).data
+print "Prediction: ", np.argmax(pred)
+print "Correct answer: ", y
+```
+
 
 ## 課題
 
