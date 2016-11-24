@@ -24,7 +24,7 @@ class MLP(chainer.Chain):
 batchsize = 100
 train, test = chainer.datasets.get_mnist()
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
-test_iter = chainer.iterators.SerialIterator(test, batchsize, repeat=False, shuffle=False)
+test_iter = chainer.iterators.SerialIterator(test, batchsize, repeat=True, shuffle=False)
 
 model = MLP(784, 10)
 opt = chainer.optimizers.Adam()
@@ -53,14 +53,14 @@ for epoch in xrange(epoch_num):
 
     test_loss_sum = 0
     test_accuracy_sum = 0
-    for i in xrange(0, test_num, args.batchsize):
-        batch = train_iter.next()
-        x = Variable(xp.asarray([s[0] for s in batch]))
-        t = Variable(xp.asarray([s[1] for s in batch]))
+    for i in xrange(0, test_num, batchsize):
+        batch = test_iter.next()
+        x = Variable(np.asarray([s[0] for s in batch]))
+        t = Variable(np.asarray([s[1] for s in batch]))
         y = model(x)
         loss = F.softmax_cross_entropy(y, t)
-        test_loss_sum += loss.data.get()
-        test_accuracy_sum += F.accuracy(y, t).data.get()
+        test_loss_sum += loss.data
+        test_accuracy_sum += F.accuracy(y, t).data
 
     print("%5d %.5f %.5f %.5f %.5f" %
         (epoch,
