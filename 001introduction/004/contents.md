@@ -101,7 +101,7 @@ y3 = F.relu(lin(x))
 
 （注：ここは飛ばしても構いません）
 
-これらを組み合わせて多層パーセプトロンをChainerを用いて実装したが次の例です。
+これらを組み合わせて多層パーセプトロンをChainerを用いて実装したのが次の例です。
 
 ```
 class MLP(chainer.Chain): # MultiLayer Perceptron
