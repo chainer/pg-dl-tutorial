@@ -1,3 +1,3 @@
 from chainer import datasets
 
-train, test = chainer.datasets.get_cifar100()
+train, test = datasets.get_cifar100()
