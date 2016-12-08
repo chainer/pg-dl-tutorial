@@ -22,8 +22,10 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
-batchsize = 100
+batchsize = 10
 train, test = chainer.datasets.get_mnist()
+train = datasets.SubDataset(train, 0, 100)
+test = datasets.SubDataset(test, 0, 100)
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
 test_iter = chainer.iterators.SerialIterator(test, batchsize,
                                              repeat=False, shuffle=False)
@@ -33,11 +35,11 @@ opt = chainer.optimizers.Adam()
 opt.use_cleargrads()
 opt.setup(model)
 
-epoch = 10
+epoch = 2
 
 # Set up a trainer
 updater = training.StandardUpdater(train_iter, opt, device=-1)
-trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
+trainer = training.Trainer(updater, (epoch, 'epoch'), out='/tmp/result')
 
 # Evaluate the model with the test dataset for each epoch
 trainer.extend(extensions.Evaluator(test_iter, model, device=-1))
