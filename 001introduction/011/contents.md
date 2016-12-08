@@ -1,101 +1,84 @@
-# MNISTの学習
+# 目的関数を定義する (4)
 
-これまで，学習/評価用データセットを作り，また学習対象のモデルを作りました。
+学習を行うために，入力と正解の出力のペアからなる $n$ 個の学習データ
 
-```
-train_full, test_full = chainer.datasets.get_mnist()
-train = datasets.SubDataset(train_full, 0, 1000)
-test = datasets.SubDataset(test_full, 0, 1000)
-model = L.Classifier(MLP(100, 10))
-```
+$$D = \\{(x_1, y_1), (x_2, y_2), ..., (x_n, y_n)\\}$$
 
-それでは実際に学習させてみましょう。
-今回は時間短縮のためMNISTデータセットのうち1000件のみを用いることにします。
+を用意します。
 
-Chainerでは学習操作を抽象化するための機能が揃っています。
-これらを利用することで殆ど自分でコードを書くことなく学習させることができます。
+この学習データと，学習対象のモデルが一致するように，つまり学習データそれぞれ $(x_i, y_i)$ に対し， $p(y_i \mid x_i)$ が大きい時に，値が小さくなるような目的関数を用意します。
 
-はじめにデータセット上の操作を抽象化する `Iterator` を用意します。
-`Iterator` は構築時にデータセットを引数として指定すると，そのデータセットに対する `Iterator` を返します。
-引数として，`batch_size` は，一度のアクセスでいくつ同時に読み込むか， `shuffle` はアクセスの際にランダムにアクセスするかどうかを指定します。
+ここでは代表的な関数である`softmax_cross_entropy`とよばれる関数を使います。
 
 ```
-# Set up a iterator
-batchsize = 100
-train_iter = chainer.iterators.SerialIterator(train, batchsize)
-test_iter = chainer.iterators.SerialIterator(test, batchsize,
-                                             repeat=False, shuffle=False)
+# x は入力, tは正解の出力
+h = MLP(x)
+loss = F.softmax_cross_entropy(h, t)
 ```
 
-次に，パラメータの最適化を担当する `Optimizer` を用意しします。
-ここでは複数ある `Optimizer` の中で `Adam` を使います。
-`Adam` は広い学習問題で安定して学習できる手法です。
+ChainerではSoftmaxを適用した後に，クロスエントロピー損失関数を適用した目的関数が用意されています。
+これは，二つまとめて処理をしないと，数値誤差の問題があるためです。
 
-`Optimizer` はsetup()で最適化対象の `Chain` または `Link` を指定する必要があります。
 
-```                                
-# Set up an optimizer
-opt = chainer.optimizers.Adam()
-opt.setup(model)
+## クロスエントロピー損失関数 (*)
+
+学習の目標は学習データの確率分布 $p(y|x)$ と，学習対象のモデルによる確率分布 $q(y \mid x; \theta)$ が一致するようにすることです。
+確率分布間がどれだけ離れているかを表す指標としてKLダイバージェンスが知られています。
+KLダイバージェンスは二つの確率分布 $P$ と $Q$ の遠さを次のように定義します。
+
+```math
+\begin{align}
+KL(P \mid\mid Q) &= \sum_x P(x) \log \frac{P(x)}{Q(x)} \\
+                 &= \sum_x P(x) \log P(x) - \sum_x P(x) \log Q(x)
+\end{align}
 ```
 
-次に，実際のパラメータ更新を担当する `Updater` を用意します。
-これまで用意した学習用データに対するIterator，最適化を担当する `Optimizer` ，そしてどのデバイスで
-実行するのかを指定します。`device=-1`はCPUを使うことを表します。
+もし， $P$ と $Q$ が同じならば，全ての $x$ について $\frac{P(x)}{Q(x)}=1$ となるので $KL(P \mid\mid Q)=0$ となります。
+この二つの分布が違うと， $KL(P \mid\mid Q)>0$ となり，近ければ近いほど0に近づくような指標です。
 
-```
-# Set up an updater
-updater = training.StandardUpdater(train_iter, opt, device=-1)
-```
+学習データによって定義される確率分布は訓練分布と呼ばれ，それに基づく条件付き確率は
 
-最後に学習ループを担当する `Trainer` を用意します。
-今回は5エポック(5回データセットを走査する)だけ学習を回すようにします。
-
-```
-# Set up a trainer
-epoch = 5
-trainer = training.Trainer(updater, (epoch, 'epoch'), out='/tmp/result')
+```math
+\begin{align}
+P(y \mid x) &= \frac{P(x, y)}{P(x)} \\
+            &= \frac{1}{n} \sum_{i} \frac{I(x=x_i, y=y_i)}{I(x=x_i)}
+\end{align}
 ```
 
-`Trainer` は様々な拡張機能を使うことができます。
+と表されます。
+但し， $I$ はデルタ関数とよばれ， $I(c)$ は $c$ が真である時は $\infty$，それ以外は $0$ であるような関数です。
 
-評価データで評価をするには，次のようにします。
 
-```
-trainer.extend(extensions.Evaluator(test_iter, model, device=-1))
-```
+訓練分布に基づく条件づき確率 $P(y \mid x)$ と，モデルによる条件づき確率 $Q(y \mid x)$ のKLダイバージェンスは
 
-学習途中の結果を表示するには，次のようにします。
-1エポックごとに、trainデータに対するaccuracyと、testデータに対するaccuracyを出力させます。
-
-```
-trainer.extend(extensions.LogReport(trigger=(1, "epoch")))
-trainer.extend(extensions.PrintReport(
-        ['epoch', 
-         'main/accuracy', 'validation/main/accuracy']), trigger=(1, "epoch"))
+```math
+\begin{align}
+KL(P \mid\mid Q) &= \sum_{x} \sum_y P(y \mid x) \log \frac{P(y \mid x)}{Q(y \mid x)} \\
+                 &= \sum_{x, y} P(y \mid x) \log P(y \mid x) - \sum_{x, y} P(y \mid x) \log Q(y \mid x)
+\end{align}
 ```
 
-これで全て用意ができました。
-trainerのrunを呼び出すことで学習できます。
+となります。
+この最適化において， $Q$ に依存する項は第二項のみであり， $(x, y) \in D$ の時 $P(y \mid x)=1$ ，それ以外 $0$ ですので
+
+$L(\theta) = - \sum_{i=1}^n \log Q(y_i \mid x_i)$
+
+となります。
+これをクロスエントロピー損失関数，または負の対数尤度ともよばれます。
+
+ここまで読んだ方で，なぜ学習データ $D$ から得られた確率分布 $P$ そのものを直接使わず，学習モデルによる確率 $Q$ を使うのかと思った方がいるかもしれません。
+それは，学習の目標は学習データだけをうまく分類することではなく未知のデータをうまく分類することだからです。
+
+$P$ は，入力が学習データと全く同じであればそれが正解となりますが，そうでない場合は確率分布が不定になりえます。
+$Q$ はありえそうなモデルの中で一番 $P$ に近い分布を探しています。
+$Q$ は $P$ とは違って全ての $x$ について確率分布を与えることができるため，学習データには含まれない未知のデータでもうまく分類できます。
+別の言い方をするとPを平滑化した確率分布がQとなります。
+
 
 ```
-# Run the trainer
-trainer.run()
-```
-
-最後に学習の結果を確認してみましょう。
-ランダムに選んだテストデータ一件に対する予測を出力します。
-
-```
-x, y = test[np.random.randint(len(test))]
-playground.print_mnist(x)
-pred = F.softmax(model.predictor(Variable(x.reshape((1, 784))))).data
-print "Prediction: ", np.argmax(pred)
-print "Correct answer: ", y
+# x は入力, tは正解の出力
+h = MLP(x)
+loss = F.softmax_cross_entropy(h, t)
 ```
 
 
-## 課題
-
-`Trainer` を実際に動かし学習できることを確かめてください。
-その上で例えばユニット数を変えたり，epoch（学習回数）を変えたり， `Optimizer` を `RMSprop()` などに変えたりして精度が変わることを確認してください。
