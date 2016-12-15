@@ -1,15 +1,11 @@
-from chainer import links as L
-from chainer import functions as F
-import numpy as np
-from chainer import Variable
+class F:
+	def __init__(self, a, b):
+		self.a = a
+		self.b = b
 
+	def __call__(self, x):
+		return self.a * x + self.b
 
-lin = L.Linear(5, 2)
-x = Variable(np.ones((3, 5), dtype=np.float32))
-y1 = lin(x)
-
-print(x.data)
-print(y1.data)
-
-y2 = F.relu(x)
-y3 = F.relu(lin(x))
+f = F(2.0, -1.0)
+print(f(1.0)) # 1.0
+print(f(2.0)) # 3.0
