@@ -11,7 +11,7 @@ $$\\|y - f(x)\\|^2$$
 loss = F.mean_squared_error(h, t)
 ```
 
-損失関数のいくつは `chainer.functions` 内で定義されています。
+損失関数のいくつかは `chainer.functions` 内で定義されています。
 また，自分で新しい損失関数を定義することもできます。
 
 得られた目的関数 $L(\theta)$ は学習対象のモデルのパラメータ $\theta$
