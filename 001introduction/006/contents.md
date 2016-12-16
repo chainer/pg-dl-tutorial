@@ -38,7 +38,7 @@ y3 = F.relu(lin(x))
 
 ## 課題
 
-reluと並んで重要な非線形関数として，sigmoidがあります。
+ReLUと並んで重要な非線形関数として，sigmoidがあります。
 例をsigmoidに変えて，その結果を表示してください。
 
 http://docs.chainer.org/en/stable/reference/functions.html
