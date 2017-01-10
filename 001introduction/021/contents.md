@@ -45,7 +45,7 @@ class MLP(chainer.Chain):
         super(MLP, self).__init__()
         self.add_link("l1", L.Linear(None, n_units))
         self.add_link("l2", L.Linear(None, n_units))
-        self.add_link("l2", L.Linear(None, n_out))
+        self.add_link("l3", L.Linear(None, n_out))
 ```
 
 例えば，ループを回して多くのLinkを登録したい場合は `add_link` で登録するのが便利です。
