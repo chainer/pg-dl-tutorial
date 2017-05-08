@@ -38,7 +38,7 @@ class Classifier(Chain):
     return loss
 ```
 
-これとほぼ同じ機能が既にchinaer.links.Classifierで実装されています。
+これとほぼ同じ機能が既にchainer.links.Classifierで実装されています。
 
 ```
 model = L.Classifier(MLP(784, 100, 10))
