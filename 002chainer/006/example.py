@@ -16,7 +16,7 @@ class MyChain(Chain):
 
 class MyChainList(ChainList):
     def __init__(self):
-        super(MyChain, self).__init__(
+        super(MyChainList, self).__init__(
             L.Linear(4, 3),
             L.Linear(3, 2),
         )
@@ -26,4 +26,4 @@ class MyChainList(ChainList):
         return self[1](h)
 
 c = MyChain()
-c2 = MyChainList
+c2 = MyChainList()
