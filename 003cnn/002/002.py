@@ -6,9 +6,8 @@ from chainer import Variable, optimizers
 from chainer import training
 from chainer.training import extensions
 import numpy as np
-import argparse
 
-train, test = chainer.datasets.get_cifar100()
+train, test = chainer.datasets.get_cifar10()
 
 class MLP(chainer.Chain):
 
@@ -25,11 +24,6 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
-parser = argparse.ArgumentParser(description='Chainer example: MNIST')
-parser.add_argument('--gpu', '-g', type=int, default=-1,
-                    help='GPU ID (negative value indicates CPU)')
-args = parser.parse_args()
-
 
 batchsize = 100
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
@@ -38,8 +32,9 @@ test_iter = chainer.iterators.SerialIterator(test, batchsize,
 
 model = L.Classifier(MLP(784, 10))
 
-if args.gpu >= 0:
-    chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
+gpu = -1
+if gpu >= 0:
+    chainer.cuda.get_device(gpu).use()  # Make a specified GPU current
     model.to_gpu()  # Copy the model to the GPU
 
 opt = chainer.optimizers.Adam()
@@ -49,11 +44,11 @@ opt.setup(model)
 epoch = 10
 
 # Set up a trainer
-updater = training.StandardUpdater(train_iter, opt, device=args.gpu)
-trainer = training.Trainer(updater, (epoch, 'epoch'), out='result')
+updater = training.StandardUpdater(train_iter, opt, device=gpu)
+trainer = training.Trainer(updater, (epoch, 'epoch'), out='/tmp/result')
 
 # Evaluate the model with the test dataset for each epoch
-trainer.extend(extensions.Evaluator(test_iter, model, device=args.gpu))
+trainer.extend(extensions.Evaluator(test_iter, model, device=gpu))
 
 # Dump a computational graph from 'loss' variable at the first iteration
 # The "main" refers to the target link of the "main" optimizer.
