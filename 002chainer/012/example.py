@@ -21,10 +21,12 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
+
 batchsize = 100
 train, test = chainer.datasets.get_mnist()
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
-test_iter = chainer.iterators.SerialIterator(test, batchsize, repeat=False, shuffle=False)
+test_iter = chainer.iterators.SerialIterator(
+    test, batchsize, repeat=False, shuffle=False)
 
 model = MLP(784, 10)
 opt = chainer.optimizers.Adam()

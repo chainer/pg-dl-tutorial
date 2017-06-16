@@ -25,5 +25,6 @@ class MyChainList(ChainList):
         h = self[0](x)
         return self[1](h)
 
+
 c = MyChain()
 c2 = MyChainList()

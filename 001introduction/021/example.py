@@ -2,6 +2,7 @@ import chainer
 from chainer import functions as F
 from chainer import links as L
 
+
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
@@ -16,5 +17,6 @@ class MLP(chainer.Chain):
         h1 = F.relu(self.l1(x))
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
+
 
 model = L.Classifier(MLP(784, 10))
