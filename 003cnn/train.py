@@ -72,10 +72,10 @@ def main():
                 x_ret.append(x)
                 y_ret.append(0 if y == 3 else 1)
         return chainer.datasets.TupleDataset(np.asarray(x_ret), np.asarray(y_ret, dtype=np.int32))
-    
+
     train = filter(train)
     test = filter(test)
-                
+
     train_iter = chainer.iterators.SerialIterator(train, args.batchsize)
     test_iter = chainer.iterators.SerialIterator(test, args.batchsize,
                                                  repeat=False, shuffle=False)
@@ -115,6 +115,7 @@ def main():
 
     # Run the training
     trainer.run()
+
 
 if __name__ == '__main__':
     main()

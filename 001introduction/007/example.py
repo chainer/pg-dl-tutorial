@@ -4,7 +4,8 @@ from chainer import links as L
 from chainer import functions as F
 from chainer import Variable
 
-class MLP(chainer.Chain): # MultiLayer Perceptron
+
+class MLP(chainer.Chain):  # MultiLayer Perceptron
 
     def __init__(self, n_units, n_out):
         super(MLP, self).__init__(
@@ -18,6 +19,7 @@ class MLP(chainer.Chain): # MultiLayer Perceptron
         h1 = F.relu(self.l1(x))
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
+
 
 model = MLP(5, 2)
 

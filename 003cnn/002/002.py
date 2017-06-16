@@ -9,6 +9,7 @@ import numpy as np
 
 train, test = chainer.datasets.get_cifar10()
 
+
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):

@@ -9,6 +9,7 @@ import numpy as np
 
 import playground
 
+
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
@@ -23,6 +24,7 @@ class MLP(chainer.Chain):
         h1 = F.relu(self.l1(x))
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
+
 
 # create model
 model = L.Classifier(MLP(100, 10))
