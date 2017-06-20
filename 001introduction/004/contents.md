@@ -9,13 +9,13 @@ Pythonプログラムでいうと，学習対象のモデルはクラスのメ�
 この関数の挙動はパラメータ $a$ と $b$ を変えることで変わります。
 
 ```
-class F:
-	def __init__(self, a, b):
-		self.a = a
-		self.b = b
+class F(object):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
 
-	def __call__(self, x):
-		return self.a * x + self.b
+    def __call__(self, x):
+        return self.a * x + self.b
 
 f = F(2.0, -1.0)
 print(f(1.0)) # 1.0
