@@ -8,7 +8,7 @@ Functionオブジェクトは学習可能なパラメータを持たない関数
 
 Functionを利用するには，そのcallオブジェクトを呼び出します。
 ニューラルネットワークで利用する多くの関数がchainer.functionsで既に実装されています。
-例えば，$relu(x) = max(x, 0)$で定義されるrelu関数は次のように呼び出します。
+例えば，$\mathrm{relu}(x) = \max(x, 0)$で定義されるrelu関数は次のように呼び出します。
 
 ```
 from chainer import functions as F
@@ -63,5 +63,4 @@ print(zz.data)
 
 ## 課題
 
-$x=[3, 4, 5]$の時，$exp(x)+sin(x)$の勾配を求めて表示せよ
-
+$x=[3, 4, 5]$の時，$\exp(x)+\sin(x)$の勾配を求めて表示せよ。
