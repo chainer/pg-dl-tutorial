@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 x = np.empty((3, 640, 480), dtype=np.int32)
 
