@@ -75,8 +75,8 @@ optimizer.update()
 
 ```
 def lossfun(args...):
-  ...
-  return loss
+    ...
+    return loss
 optimizer.update(lossfun, args...)
 ```
 
@@ -99,7 +99,7 @@ s := s - a v
 
 ```
 def f(x):
-  return 5.*x + 10
+    return 5.*x + 10
 
 x = np.linspace(-10, 10, num=1001)
 y = f(x) + 5.*np.random.randn()

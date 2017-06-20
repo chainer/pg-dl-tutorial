@@ -8,15 +8,15 @@ Chainはユーザーがネットワークを定義する際に利用されます
 
 ```
 class MyChain(Chain):
-  def __init__(self):
-    super(MyChain, self).__init__(
-      l1=L.Linear(4, 3),
-      l2=L.Linear(3, 2),
-    )
+    def __init__(self):
+        super(MyChain, self).__init__(
+            l1=L.Linear(4, 3),
+            l2=L.Linear(3, 2),
+        )
 
-  def __call__(self, x):
-    h = self.l1(x)
-    return self.l2(h)
+    def __call__(self, x):
+        h = self.l1(x)
+        return self.l2(h)
 ```
 
 Chainを継承すると，その中に含まれる複数のLinkの管理やCPU/GPU間のデータ移動などが実現されます。
@@ -39,15 +39,15 @@ print(c.l1.data)
 
 ```
 class MyChainList(ChainList):
-  def __init__(self):
-    super(MyChain, self).__init__(
-      L.Linear(4, 3),
-      L.Linear(3, 2),
-    )
+    def __init__(self):
+        super(MyChain, self).__init__(
+            L.Linear(4, 3),
+            L.Linear(3, 2),
+        )
 
-  def __call__(self, x):
-    h = self[0](x)
-    return self[1](h)
+    def __call__(self, x):
+        h = self[0](x)
+        return self[1](h)
 ```
 
 # 課題

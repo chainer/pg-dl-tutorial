@@ -8,18 +8,18 @@
 
 ```
 class MLP(chainer.Chain):
-  def __init__(self, n_units, n_out):
-      super(MLP, self).__init__(
-          # the size of the inputs to each layer will be inferred
-          l1=L.Linear(None, n_units),  # n_in -> n_units
-          l2=L.Linear(None, n_units),  # n_units -> n_units
-          l3=L.Linear(None, n_out),  # n_units -> n_out
-      )
+    def __init__(self, n_units, n_out):
+        super(MLP, self).__init__(
+            # the size of the inputs to each layer will be inferred
+            l1=L.Linear(None, n_units),  # n_in -> n_units
+            l2=L.Linear(None, n_units),  # n_units -> n_units
+            l3=L.Linear(None, n_out),  # n_units -> n_out
+        )
 
-  def __call__(self, x):
-      h1 = F.relu(self.l1(x))
-      h2 = F.relu(self.l2(h1))
-      return self.l3(h2)
+    def __call__(self, x):
+        h1 = F.relu(self.l1(x))
+        h2 = F.relu(self.l2(h1))
+        return self.l3(h2)
 ```
 
 次に，損失関数を定義するClassifierを定義します。
@@ -27,15 +27,15 @@ Classiferは精度を計算した上で損失をsoftmax_cross_entropyを使っ�
 
 ```
 class Classifier(Chain):
-  def __init__(self, predictor):
-    super(Classifier, self).__init__(predictor=predictor)
+    def __init__(self, predictor):
+        super(Classifier, self).__init__(predictor=predictor)
 
-  def __call__(self, x, t):
-    y = self.predictor(x)
-    loss = F.softmax_cross_entropy(y, t)
-    accuracy = F.accuracy(y, t)
-    report({'loss': loss, 'accuracy': accuracy}, self)
-    return loss
+    def __call__(self, x, t):
+        y = self.predictor(x)
+        loss = F.softmax_cross_entropy(y, t)
+        accuracy = F.accuracy(y, t)
+        report({'loss': loss, 'accuracy': accuracy}, self)
+        return loss
 ```
 
 これとほぼ同じ機能が既にchainer.links.Classifierで実装されています。
