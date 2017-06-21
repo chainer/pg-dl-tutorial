@@ -11,11 +11,11 @@
 前の章のMNISTは簡単な手書き文字認識でしたが，この章では画像はMNIST同様に小さいもの背景と前景が重なっており，同じクラスでもバリエーションが非常に大きい画像の認識を扱います。
 
 
-MNISTと同様に，CIFAR-10も読み込むことができます。
+MNISTと同様に，CIFAR-100も読み込むことができます。
 
 ```
 from chainer import datasets
-train, test = datasets.get_cifar10()
+train, test = datasets.get_cifar100()
 ```
 
 実際のサイズを確認してみましょう
