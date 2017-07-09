@@ -9,10 +9,10 @@ Chainはユーザーがネットワークを定義する際に利用されます
 ```
 class MyChain(Chain):
     def __init__(self):
-        super(MyChain, self).__init__(
-            l1=L.Linear(4, 3),
-            l2=L.Linear(3, 2),
-        )
+        super(MyChain, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(4, 3)
+            self.l2 = L.Linear(3, 2)
 
     def __call__(self, x):
         h = self.l1(x)
@@ -21,7 +21,7 @@ class MyChain(Chain):
 
 Chainを継承すると，その中に含まれる複数のLinkの管理やCPU/GPU間のデータ移動などが実現されます。
 
-ChainではLinkを登録するには，例のように初期化の中で名前付きオブジェクトとして登録するか，add_link(name, link)を使って登録します。
+ChainではLinkを登録するには，例のように`with self.init_scope()`の中で登録します。
 
 Chainの中に含まれるLinkを子Linkとよびます。
 例えばさきほどの例ではl1とl2がMyChainの子Linkです。

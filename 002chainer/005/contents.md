@@ -44,21 +44,18 @@ LinkはFunctionと同様に関数として呼び出すことができます。
 例えば，先程のLinearはバッチサイズがNの時，shapeが(N, 3)であるVariableを入力とし，shapeが(N, 2)でVariableを出力します。
 
 ```
-x = Variable(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.float32))
+x = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.float32)
 y = f(x)
 print(y.data)
 ```
 
-Linksでは次のようなメソッドがあります。
-全て覚える必要はありませんが
+Linksでは次のようなメソッドがあります（全て覚える必要はありません）。
 
-* add_param(name, shape)
-　新しくparameterを追加する。これはsave, load時の対象となり，optimizationの対象となる
 * add_persistent(name, value)
 　save, load時の対象となるパラメータを追加する。
 * addgrads(link)
 　linkのgradient値を加算する。例えば分散学習時に使われる。
-* children
+* children()
 　子のlinkのgeneratorを返す。
 * cleargrads()
 　gradの値を0に初期化する。backward命令の前に呼び出す必要がある。
@@ -68,9 +65,9 @@ Linksでは次のようなメソッドがあります。
 　linkからparameterをコピーする。
 * namedlinks()
 　全てのpath, linkを返す
-* namedparams
+* namedparams()
 　全てのpath, paramを返す
-* serialize（serializer）
+* serialize(serializer)
 　このlinkオブジェクトをserializeする
 * to_cpu()
 　パラメータとpersistent値をCPUにコピーする
@@ -89,5 +86,4 @@ links.Linearは内部でfunctions.Linearを呼び出して使っています。
 
 ## 課題
 
-入力，出力がともに(N, 3, 4)であるような[bias](http://docs.chainer.org/en/stable/reference/links.html?highlight=link#bias)を作り，それをshapeが(2, 3, 4)であるVariableに適用し，その結果を表示せよ
-http://docs.chainer.org/en/stable/reference/links.html?highlight=link#bias
+入力，出力がともに(N, 3, 4)であるような[bias](http://docs.chainer.org/en/stable/reference/links.html?highlight=link#bias)を作り，それをshapeが(2, 3, 4)であるVariableに適用し，その結果を表示せよ。

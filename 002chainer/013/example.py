@@ -1,20 +1,17 @@
 import chainer
-from chainer import datasets
-from chainer import links as L
 from chainer import functions as F
-from chainer import Variable, optimizers
+from chainer import links as L
 import numpy as np
 
 
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units),  # n_units -> n_units
-            l3=L.Linear(None, n_out),  # n_units -> n_out
-        )
+        super(MLP, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(None, n_units)  # n_in -> n_units
+            self.l2 = L.Linear(None, n_units)  # n_units -> n_units
+            self.l3 = L.Linear(None, n_out)    # n_units -> n_out
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
@@ -30,20 +27,19 @@ test_iter = chainer.iterators.SerialIterator(
 
 model = MLP(784, 10)
 opt = chainer.optimizers.Adam()
-opt.use_cleargrads()
 opt.setup(model)
 
 train_num = len(train)
 test_num = len(test)
 
 epoch_num = 10
-for epoch in xrange(epoch_num):
+for epoch in range(epoch_num):
     train_loss_sum = 0
     train_accuracy_sum = 0
-    for i in xrange(0, train_num, batchsize):
+    for i in range(0, train_num, batchsize):
         batch = train_iter.next()
-        x = Variable(np.asarray([s[0] for s in batch]))
-        t = Variable(np.asarray([s[1] for s in batch]))
+        x = np.asarray([s[0] for s in batch])
+        t = np.asarray([s[1] for s in batch])
         y = model(x)
         loss = F.softmax_cross_entropy(y, t)
         model.cleargrads()
@@ -55,10 +51,10 @@ for epoch in xrange(epoch_num):
 
     test_loss_sum = 0
     test_accuracy_sum = 0
-    for i in xrange(0, test_num, batchsize):
+    for i in range(0, test_num, batchsize):
         batch = test_iter.next()
-        x = Variable(np.asarray([s[0] for s in batch]))
-        t = Variable(np.asarray([s[1] for s in batch]))
+        x = np.asarray([s[0] for s in batch])
+        t = np.asarray([s[1] for s in batch])
         y = model(x)
         loss = F.softmax_cross_entropy(y, t)
         test_loss_sum += loss.data

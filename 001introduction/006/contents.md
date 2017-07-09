@@ -41,6 +41,4 @@ y3 = F.relu(lin(x))
 ReLUと並んで重要な非線形関数として，sigmoidがあります。
 例をsigmoidに変えて，その結果を表示してください。
 
-http://docs.chainer.org/en/stable/reference/functions.html
-
-
+[関数一覧](http://docs.chainer.org/en/stable/reference/functions.html)

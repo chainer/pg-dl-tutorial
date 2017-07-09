@@ -8,13 +8,13 @@
 
 ```
 class MLP(chainer.Chain):
+
     def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units),  # n_units -> n_units
-            l3=L.Linear(None, n_out),  # n_units -> n_out
-        )
+        super(MLP, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(None, n_units)  # n_in -> n_units
+            self.l2 = L.Linear(None, n_units)  # n_units -> n_units
+            self.l3 = L.Linear(None, n_out)    # n_units -> n_out
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
@@ -28,7 +28,9 @@ Classiferは精度を計算した上で損失をsoftmax_cross_entropyを使っ�
 ```
 class Classifier(Chain):
     def __init__(self, predictor):
-        super(Classifier, self).__init__(predictor=predictor)
+        super(Classifier, self).__init__()
+        with self.init_scope():
+            self.predictor = predictor
 
     def __call__(self, x, t):
         y = self.predictor(x)
@@ -43,7 +45,6 @@ class Classifier(Chain):
 ```
 model = L.Classifier(MLP(784, 100, 10))
 opt = optimizers.Adam()
-opt.use_cleargrads()
 opt.setup(model)
 ```
 

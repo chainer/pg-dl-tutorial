@@ -89,9 +89,9 @@ trainer.run()
 ```
 x, y = test[np.random.randint(len(test))]
 playground.print_mnist(x)
-pred = F.softmax(model.predictor(Variable(x.reshape((1, 784))))).data
-print "Prediction: ", np.argmax(pred)
-print "Correct answer: ", y
+pred = F.softmax(model.predictor(x.reshape(1, 784))).data
+print("Prediction: ", np.argmax(pred))
+print("Correct answer: ", y)
 ```
 
 
