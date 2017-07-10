@@ -1,21 +1,19 @@
 import chainer
 from chainer import datasets
-from chainer import links as L
 from chainer import functions as F
-from chainer import Variable, optimizers
+from chainer import links as L
 from chainer import training
 from chainer.training import extensions
-import numpy as np
 
 
 class MLP(chainer.Chain):
+
     def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units),  # n_units -> n_units
-            l3=L.Linear(None, n_out),  # n_units -> n_out
-        )
+        super(MLP, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(None, n_units)  # n_in -> n_units
+            self.l2 = L.Linear(None, n_units)  # n_units -> n_units
+            self.l3 = L.Linear(None, n_out)    # n_units -> n_out
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
@@ -24,7 +22,7 @@ class MLP(chainer.Chain):
 
 
 batchsize = 10
-train, test = chainer.datasets.get_mnist()
+train, test = datasets.get_mnist()
 train = datasets.SubDataset(train, 0, 100)
 test = datasets.SubDataset(test, 0, 100)
 train_iter = chainer.iterators.SerialIterator(train, batchsize)
@@ -33,7 +31,6 @@ test_iter = chainer.iterators.SerialIterator(test, batchsize,
 
 model = L.Classifier(MLP(784, 10))
 opt = chainer.optimizers.Adam()
-opt.use_cleargrads()
 opt.setup(model)
 
 epoch = 2
@@ -50,7 +47,7 @@ trainer.extend(extensions.Evaluator(test_iter, model, device=-1))
 # trainer.extend(extensions.dump_graph('main/loss'))
 
 # Take a snapshot at each epoch
-#trainer.extend(extensions.snapshot(), trigger=(epoch, 'epoch'))
+# trainer.extend(extensions.snapshot(), trigger=(epoch, 'epoch'))
 
 # Write a log of evaluation statistics for each epoch
 trainer.extend(extensions.LogReport())

@@ -1,13 +1,14 @@
-from chainer import Chain, ChainList
+from chainer import Chain
+from chainer import ChainList
 from chainer import links as L
 
 
 class MyChain(Chain):
     def __init__(self):
-        super(MyChain, self).__init__(
-            l1=L.Linear(4, 3),
-            l2=L.Linear(3, 2),
-        )
+        super(MyChain, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(4, 3)
+            self.l2 = L.Linear(3, 2)
 
     def __call__(self, x):
         h = self.l1(x)

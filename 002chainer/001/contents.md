@@ -21,7 +21,7 @@ x = Variable(x_data)
 例えば，次のように実行できます。
 
 ```
-y = x**2 - 2 * x + 1
+y = x ** 2 - 2 * x + 1
 ```
 
 Variableオブジェクトを使った演算結果はVariableオブジェクトとなります。
@@ -38,7 +38,7 @@ y.data
 ```
 z_data = np.array([[2, 3, 4], [5, 6, 7]], dtype=np.float32)
 z = Variable(z_data)
-print(z[:,1].data) # [3, 6]
+print(z[:, 1].data) # [3, 6]
 ```
 
 # 課題

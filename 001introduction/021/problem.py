@@ -17,4 +17,4 @@ model = L.Classifier(MLP(784, 2))
 
 # print out namedlinks
 for l in model.namedlinks():
-    print l
+    print(l)
