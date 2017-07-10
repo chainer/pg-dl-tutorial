@@ -7,7 +7,7 @@ print(355.0 / 113.0)
 print(np.eye(5))
 
 total = 0
-for i in xrange(10):
+for i in range(10):
     total += i
 
 print(total)

@@ -12,7 +12,7 @@ epoch_num = 5
 for epoch in range(epoch_num):
     train_loss_sum = 0
     train_accuracy_sum = 0
-    for i in xrange(0, train_num, batchsize):
+    for i in range(0, train_num, batchsize):
         batch = train_iter.next()
         x = np.asarray([s[0] for s in batch])
         t = np.asarray([s[1] for s in batch])
