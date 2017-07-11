@@ -1,7 +1,7 @@
-from chainer import links as L
 from chainer import functions as F
-import numpy as np
+from chainer import links as L
 from chainer import Variable
+import numpy as np
 
 
 lin = L.Linear(5, 2)

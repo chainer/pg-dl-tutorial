@@ -1,6 +1,7 @@
-import numpy as np
-from chainer import Variable
 from chainer import functions as F
+from chainer import Variable
+import numpy as np
+
 
 x_data = np.array([5], dtype=np.float32)
 x = Variable(x_data)

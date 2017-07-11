@@ -14,12 +14,12 @@ from chainer import functions as F
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
+        super(MLP, self).__init__()
+        with self.init_scope():
             # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units), # n_units -> n_units
-            l3=L.Linear(None, n_out)  # n_units -> n_out
-        )
+            self.l1 = L.Linear(None, n_units)  # n_in -> n_units
+            self.l2 = L.Linear(None, n_units)  # n_units -> n_units
+            self.l3 = L.Linear(None, n_out)    # n_units -> n_out
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
@@ -30,30 +30,11 @@ class MLP(chainer.Chain):
 ニューラルネットワークのモデルを定義するオブジェクトは `chainer.Chain`（以降 `Chain` ）を継承します。
 `Chain` を継承することで，このモデルを保存したり読み込んだりすることができます。
 
-モデルでは初期化時にモデル内で利用するパラメータ付き関数であるLinkを登録します。
+モデルでは`with self.init_scopre()`のスコープ内で利用するパラメータ付き関数であるLinkを登録します。
 
 上記の例では `Linear` である `l1`, `l2`, `l3` を登録しています。
 `Linear` は線形変換であり，初期化引数として入力次元数と出力次元数をうけとります。
 `Linear` の入力次元数に `None` を指定した時は，それが最初に呼び出された時，次元数を引数から推定してくれます。
-
-`Chain` においてLinkの登録は例のように `__init__` の中で定義することもできますし，次のように `add_link(name, link)` で登録することもできます。
-
-```
-class MLP(chainer.Chain):
-
-    def __init__(self, n_units, n_out):
-        super(MLP, self).__init__()
-        self.add_link("l1", L.Linear(None, n_units))
-        self.add_link("l2", L.Linear(None, n_units))
-        self.add_link("l3", L.Linear(None, n_out))
-```
-
-例えば，ループを回して多くのLinkを登録したい場合は `add_link` で登録するのが便利です。
-
-```
-for i in range(10):
-    self.add_link("l{}".format(i), L.Linear(None, n_units))
-```
 
 初期化時に登録されたLinkはあとで `self.l1` のようにオブジェクトの属性として参照できます。
 

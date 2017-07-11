@@ -14,12 +14,11 @@ import numpy as np
 class MLP(chainer.Chain):
 
     def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units),  # n_units -> n_units
-            l3=L.Linear(None, n_out),  # n_units -> n_out
-        )
+        super(MLP, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Linear(None, n_units)  # n_in -> n_units
+            self.l2 = L.Linear(None, n_units)  # n_units -> n_units
+            self.l3 = L.Linear(None, n_out)  # n_units -> n_out
 
     def __call__(self, x):
         h1 = F.relu(self.l1(x))
@@ -62,7 +61,7 @@ def main():
     optimizer.setup(model)
 
     # Load the MNIST dataset
-    train, test = chainer.datasets.get_cifar10(ndim=1)
+    train, test = chainer.datasets.get_cifar100(ndim=1)
 
     def filter(dataset):
         x_ret = []
@@ -71,7 +70,8 @@ def main():
             if y in [3, 5]:
                 x_ret.append(x)
                 y_ret.append(0 if y == 3 else 1)
-        return chainer.datasets.TupleDataset(np.asarray(x_ret), np.asarray(y_ret, dtype=np.int32))
+        return chainer.datasets.TupleDataset(np.asarray(x_ret),
+                                             np.asarray(y_ret, dtype=np.int32))
 
     train = filter(train)
     test = filter(test)
