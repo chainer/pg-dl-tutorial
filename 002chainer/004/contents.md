@@ -6,7 +6,7 @@ Functionオブジェクトは学習可能なパラメータを持たない関数
 また，CPUとGPUの両方における計算が定義されています。
 内部では，foward_cpu, foward_gpu, backward_cpu, backward_gpuの四種類の実装がされています。
 
-Functionを利用するには，そのcallオブジェクトを呼び出します。
+Functionを利用するには，Functionのインスタンスを作成後に関数として呼びだします。
 ニューラルネットワークで利用する多くの関数がchainer.functionsで既に実装されています。
 例えば，$\mathrm{relu}(x) = \max(x, 0)$で定義されるrelu関数は次のように呼び出します。
 
