@@ -1,7 +1,7 @@
 # Chainerの基本：Serializer
 
 最後に紹介する機能がシリアライザです．
-Link, Optimizer, Trainerがシリアリザをサポートしています。
+Link, Optimizer, Trainerがシリアライザをサポートしています。
 
 ```
 serializers.save_npz('my.model', model)
