@@ -12,7 +12,7 @@ serializers.save_npz('my.model', model)
 保存されたモデルはload_npzで読み込むことができます。
 
 ```
-serializers.load_npz'my.model', model)
+serializers.load_npz('my.model', model)
 ```
 
 同様に，HDF5フォーマットで保存するためのsave_hdf5, load_hdf5が存在します。
