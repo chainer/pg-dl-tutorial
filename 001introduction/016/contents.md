@@ -17,7 +17,7 @@ opt.setup(model)
 そして，勾配を求めて，その勾配情報を元に最適化します。
 
 ```
-loss.backprop()
+loss.backward()
 opt.update()
 ```
 
