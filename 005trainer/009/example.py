@@ -1,13 +1,14 @@
-from chainer import serializers
+import matplotlib.pyplot as plt
 
-# Create an instance of the network you trained
-model = MyNetwork()
+model = MLP()
+serializers.load_npz('mnist_result/model_epoch-10', model)
 
-# Load the saved paremeters into the instance
-serializers.load_npz('my_mnist.model', model)
-
-# Get a test image and label
+# Show the output
 x, t = test[0]
 plt.imshow(x.reshape(28, 28), cmap='gray')
-plt.savefig('7.png')
+plt.show()
 print('label:', t)
+
+y = model(x[None, ...])
+
+print('predicted_label:', y.data.argmax(axis=1)[0])
