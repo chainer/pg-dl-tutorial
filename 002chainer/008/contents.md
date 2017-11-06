@@ -105,7 +105,7 @@ x = np.linspace(-10, 10, num=1001)
 y = f(x) + 5.*np.random.randn()
 ```
 
-で与えられるデータセット$(x, y)$について最小二乗誤差（F.mean_squared_loss）を損失関数として使ってSGDで
+で与えられるデータセット$(x, y)$について最小二乗誤差（F.mean_squared_error）を損失関数として使ってSGDで
 
 ```math
 y = ax + b
