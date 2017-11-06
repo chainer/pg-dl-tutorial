@@ -32,7 +32,7 @@ Chainの子リンクは属性としてアクセスすることができます。
 
 ```
 c = MyChain()
-print(c.l1.data)
+print(c.l1.W.data)
 ```
 
 また，Chainでは各Linkを名前付きで定義していましたが，任意個のLinkのリストを受け取るChainListを使うこともできます。
